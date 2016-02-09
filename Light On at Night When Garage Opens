@@ -1,0 +1,67 @@
+/**
+ *  Open Garage Door turn on Desk Light
+ *
+ *  Copyright 2016 Charles Dennis
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License. You may obtain a copy of the License at:
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+ *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
+ *  for the specific language governing permissions and limitations under the License.
+ *
+ */
+definition(
+    name: "Garage Desk Light",
+    namespace: "ctdennis",
+    author: "Charles Dennis",
+    description: "This application will turn a light of your choice on when the garage door is opened provided that it is after sunset.",
+    category: "My Apps",
+    iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
+    iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
+    iconX3Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png")
+
+//this section allows users of the application to select the light that they would like to turn on
+//and the door controler that signals it.
+preferences {
+        //first allow the user to select the switch
+        section("Turn this on when door opens:") { //label that the user of the application will be presented with
+        	input "theswitch","capability.switch", required: true //definitions of the device.. named the switch, capability of a switch and the user is required to make this selection
+	}
+	      //allow the user to select the garage door opener
+    	section("Which door") { //label that the user of the application will be presented with
+        	input "thedoor","capability.doorControl", required: true //definitions of the device.. named the door, capability of the door control and the user is required to make this selection
+    }
+        
+}
+//Install
+def installed() {
+	log.debug "Installed with settings: ${settings}"
+	initialize()
+}
+//Update
+def updated() {
+	log.debug "Updated with settings: ${settings}"
+	unsubscribe()
+	initialize()
+}
+//Initialize
+def initialize() {
+	// TODO: subscribe to attributes, devices, locations, etc.
+    subscribe(thedoor, "door.open", doorDetectHandler) //when the door open event fires, run a routine below called doorDetectHandler
+      }
+    
+def doorDetectHandler(evt) {
+	log.debug "doorDetectHandler called: $evt"
+  
+  def times = getSunriseAndSunset() //this function gets the sunrise and sunset times based on the default settings in smartthings and assigns it to the variable 'times'
+	def now = new Date() //this gets the date and time when to evaluate when this app is run. it is used to compare against the sunset.
+	
+	if (now > times.sunset) { //if the time now is before sunset then do nothing, if it is after sunset then...
+		    theswitch.on() //...turn the switch on
+	} 
+	    
+    }  
+	
