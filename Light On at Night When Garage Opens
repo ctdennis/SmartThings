@@ -14,7 +14,7 @@
  *
  */
 definition(
-    name: "Garage Desk Light",
+    name: "Open Garage Turn On Light",
     namespace: "ctdennis",
     author: "Charles Dennis",
     description: "This application will turn a light of your choice on when the garage door is opened provided that it is after sunset.",
@@ -56,7 +56,7 @@ def initialize() {
 def doorDetectHandler(evt) {
 	log.debug "doorDetectHandler called: $evt"
   
-  def times = getSunriseAndSunset() //this function gets the sunrise and sunset times based on the default settings in smartthings and assigns it to the variable 'times'
+    def times = getSunriseAndSunset(sunsetOffset: "-00:45") //this function gets the sunrise and sunset times based on the default settings in smartthings and assigns it to the variable 'times'
 	def now = new Date() //this gets the date and time when to evaluate when this app is run. it is used to compare against the sunset.
 	
 	if (now > times.sunset) { //if the time now is before sunset then do nothing, if it is after sunset then...
@@ -64,4 +64,3 @@ def doorDetectHandler(evt) {
 	} 
 	    
     }  
-	
